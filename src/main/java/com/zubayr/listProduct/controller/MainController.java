@@ -19,4 +19,6 @@ public interface MainController {
 
     ResponseEntity<ListOfProductsDto> getById(Long id);
 
+    ResponseEntity<?> updateNameList(Long listId, String name);
+
 }

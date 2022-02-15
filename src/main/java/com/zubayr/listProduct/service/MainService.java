@@ -10,6 +10,8 @@ import com.zubayr.listProduct.repository.ListRepository;
 import com.zubayr.listProduct.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@PropertySource("classpath:application.yml")
 public class MainService {
 
     private final ListRepository listRepository;
@@ -54,10 +57,7 @@ public class MainService {
     }
 
     public ResponseEntity<Set<ProductDto>> getAllProducts() {
-        return ResponseEntity.ok(productRepository.findAll()
-                .stream()
-                .map(ProductDto::createDto)
-                .collect(Collectors.toSet()));
+        return ResponseEntity.ok(productRepository.findAllProduct());
     }
 
     public ResponseEntity<ListOfProductsDto> getListOfProduct(Long listId) {
@@ -66,5 +66,10 @@ public class MainService {
                 .map(list -> ResponseEntity.ok(ListOfProductsDto.createDto(list)))
                 .orElse(null);
 
+    }
+
+    public ResponseEntity<?> updateNameList(Long listId, String newName) throws ChangeSetPersister.NotFoundException {
+        listRepository.updateNameList(listId, newName);
+        return ResponseEntity.ok(listRepository.findById(listId).orElseThrow(ChangeSetPersister.NotFoundException::new));
     }
 }

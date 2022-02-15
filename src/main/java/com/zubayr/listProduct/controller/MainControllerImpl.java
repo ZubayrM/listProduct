@@ -6,7 +6,10 @@ import com.zubayr.listProduct.dto.ProductDto;
 import com.zubayr.listProduct.service.MainService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -56,5 +59,17 @@ public class MainControllerImpl implements MainController{
     @ApiOperation("Get list of Products")
     public ResponseEntity<ListOfProductsDto> getById(@PathVariable Long id) {
         return mainService.getListOfProduct(id);
+    }
+
+    @Override
+    @PutMapping("/updateNameList/{id}")
+    @ApiOperation("Change list name")
+    @Transactional
+    public ResponseEntity<?> updateNameList(@PathVariable(name = "id") Long listId, @RequestParam(name = "new_name") String newName) {
+        try {
+            return mainService.updateNameList(listId, newName);
+        } catch (ChangeSetPersister.NotFoundException e){
+            return ResponseEntity.badRequest().body(HttpStatus.NOT_FOUND);
+        }
     }
 }
